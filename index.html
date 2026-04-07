@@ -442,7 +442,7 @@
   <div class="hero-name"><span>Lost</span></div>
   <div class="hero-name"><span>City</span></div>
   <div class="hero-sub">
-    <p>Crafted for those<br>who move between asses.</p>
+    <p>Crafted for those<br>who move between worlds.</p>
     <a href="#collections" class="hero-cta">
       View Collection
       <span style="display:inline-block;width:20px;height:1px;background:currentColor;"></span>
@@ -559,9 +559,53 @@ repeated.forEach((txt, i) => {
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.15 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));\
  async function loadProducts() {
   try {
+    const res = await fetch('/api/products');
+    const products = await res.json();
+
+    const grid = document.getElementById('productGrid');
+
+    if (!grid) return;
+
+    if (!products.length) {
+      grid.innerHTML = '<p style="font-size:0.8rem; color: var(--ash);">No products available right now.</p>';
+      return;
+    }
+
+    grid.innerHTML = products.map((product, index) => {
+      return `
+        <div class="collection-card reveal" style="transition-delay:${index * 0.1}s">
+          <div class="card-img">
+            <img src="${product.image}" alt="${product.name}">
+            <div class="card-overlay">
+              <span class="card-overlay-text">Quick View</span>
+            </div>
+          </div>
+          <div class="card-label">
+            <div>
+              <p class="card-name">${product.name}</p>
+              <p class="card-tag">${product.category} · SS25</p>
+            </div>
+            <span class="card-price">$${product.price}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  } catch (error) {
+    console.error('Error loading products:', error);
+
+    const grid = document.getElementById('productGrid');
+    if (grid) {
+      grid.innerHTML = '<p style="font-size:0.8rem; color: var(--ash);">Failed to load products.</p>';
+    }
+  }
+}
+
+loadProducts();
     const res = await fetch('/api/products');
     const products = await res.json();
 
