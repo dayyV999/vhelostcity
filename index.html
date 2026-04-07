@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VheLostCity</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f2ec;
+    --ash: #b8b4ae;
+    --smoke: #e8e4de;
+    --accent: #1a1a1a;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    opacity: 0.4;
+  }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 1.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0;
+    animation: fadeDown 0.8s 0.3s forwards;
+  }
+  .nav-links {
+    display: flex; gap: 2.5rem;
+    list-style: none;
+    opacity: 0;
+    animation: fadeDown 0.8s 0.5s forwards;
+  }
+  .nav-links a {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 1px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 0 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+  .hero-name {
+    display: block;
+    overflow: hidden;
+    line-height: 0.9;
+  }
+  .hero-name span {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(5rem, 13vw, 12rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    transform: translateY(110%);
+    animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .hero-name:nth-child(2) span { animation-delay: 0.2s; }
+  .hero-name:nth-child(3) span { animation-delay: 0.35s; }
+  .hero-sub {
+    margin-top: 2.5rem;
+    display: flex; gap: 3rem; align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.1s forwards;
+  }
+  .hero-sub p {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    line-height: 1.8;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    padding: 1rem 2rem;
+    transition: background 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+  }
+  .hero-cta:hover { background: var(--ink); color: var(--paper); }
+  .hero-line {
+    position: absolute;
+    right: 3rem; top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 0;
+    background: var(--ash);
+    animation: lineGrow 1.2s 1.3s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 3rem;
+    display: flex; align-items: center; gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.8s forwards;
+  }
+  .hero-scroll span {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ash);
+    writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: var(--ash);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: -100%; left: 0; right: 0; bottom: 0;
+    background: var(--ink);
+    animation: scrollPulse 2s 2s infinite;
+  }
+  .marquee-section {
+    border-top: 1px solid var(--smoke);
+    border-bottom: 1px solid var(--smoke);
+    padding: 1.2rem 0;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .marquee-track {
+    display: flex; gap: 0;
+    width: max-content;
+    animation: marquee 18s linear infinite;
+  }
+  .marquee-item {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--ash);
+    padding: 0 3rem;
+    white-space: nowrap;
+  }
+  .marquee-dot {
+    color: var(--ink);
+    padding: 0;
+    margin: 0 -2rem;
+    font-size: 0.5rem;
+  }
+  .section { padding: 8rem 3rem; }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 4rem;
+    border-bottom: 1px solid var(--smoke);
+    padding-bottom: 1.5rem;
+  }
+  .section-number {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--ash);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  .section-link {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ash);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .section-link:hover { color: var(--ink); }
+  .collection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .collection-card { position: relative; overflow: hidden; cursor: none; }
+  .card-img {
+    aspect-ratio: 3/4;
+    background: var(--smoke);
+    position: relative;
+    overflow: hidden;
+  }
+  .card-img-fill {
+    position: absolute; inset: 0;
+    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .card-img-fill.c1 { background: linear-gradient(135deg, #d4cfc7 0%, #b8b0a4 100%); }
+  .card-img-fill.c2 { background: linear-gradient(135deg, #c5c0b8 0%, #a09890 100%); }
+  .card-img-fill.c3 { background: linear-gradient(135deg, #e0dbd3 0%, #c8c2b8 100%); }
+  .card-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: flex-end;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(13,13,13,0.5) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .card-overlay-text {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #f5f2ec;
+  }
+  .collection-card:hover .card-img-fill { transform: scale(1.05); }
+  .collection-card:hover .card-overlay { opacity: 1; }
+  .card-label {
+    padding: 1rem 0 0;
+    display: flex; justify-content: space-between;
+  }
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+  .card-tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-top: 0.2rem;
+  }
+  .card-price {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+    align-self: flex-start;
+    padding-top: 0.3rem;
+  }
+  .statement-section {
+    padding: 8rem 3rem;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .statement-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .statement-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.4);
+    margin-bottom: 2rem;
+  }
+  .statement-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.3;
+    font-style: italic;
+    color: var(--paper);
+    margin-bottom: 3rem;
+  }
+  .statement-cta {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--paper);
+    text-decoration: none;
+    border: 1px solid rgba(245,242,236,0.3);
+    padding: 1rem 2.5rem;
+    transition: background 0.3s ease, border-color 0.3s;
+  }
+  .statement-cta:hover {
+    background: rgba(245,242,236,0.08);
+    border-color: rgba(245,242,236,0.6);
+  }
+  footer {
+    padding: 4rem 3rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    border-top: 1px solid var(--smoke);
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .footer-tagline {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+  .footer-col-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 1.25rem;
+  }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 0.6rem; }
+  .footer-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--ash); }
+  .footer-bottom {
+    padding: 1.5rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--smoke);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+  }
+  @keyframes slideUp { to { transform: translateY(0); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes lineGrow { to { height: 35vh; } }
+  @keyframes scrollPulse {
+    0% { top: -100%; }
+    100% { top: 100%; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (max-width: 768px) {
+    nav { padding: 1.25rem 1.5rem; }
+    .hero { padding: 0 1.5rem; }
+    .section { padding: 5rem 1.5rem; }
+    .collection-grid { grid-template-columns: 1fr; gap: 2rem; }
+    footer { grid-template-columns: 1fr; padding: 3rem 1.5rem 2rem; }
+    .footer-bottom { padding: 1.5rem; flex-direction: column; gap: 0.5rem; }
+    .hero-line { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<nav>
+  <a href="#" class="nav-logo">VheLostCity</a>
+  <ul class="nav-links">
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#stockists">Stockists</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+<section class="hero">
+  <p class="hero-eyebrow">Est. — Clothing & Apparel</p>
+  <div class="hero-name" style="animation-delay:0s"><span>Vhe</span></div>
+  <div class="hero-name"><span>Lost</span></div>
+  <div class="hero-name"><span>City</span></div>
+  <div class="hero-sub">
+    <p>Crafted for those<br>who move between worlds.</p>
+    <a href="#collections" class="hero-cta">
+      View Collection
+      <span style="display:inline-block;width:20px;height:1px;background:currentColor;"></span>
+    </a>
+  </div>
+  <div class="hero-line"></div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+<section class="section" id="collections">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-number">01 /</p>
+      <h2 class="section-title">Current Drop</h2>
+    </div>
+    <a href="#" class="section-link">View all →</a>
+  </div>
+  <div class="collection-grid">
+    <div class="collection-card reveal" style="transition-delay:0s">
+      <div class="card-img">
+        <div class="card-img-fill c1"></div>
+        <div class="card-overlay"><span class="card-overlay-text">Quick View</span></div>
+      </div>
+      <div class="card-label">
+        <div>
+          <p class="card-name">Void Jacket</p>
+          <p class="card-tag">Outerwear · SS25</p>
+        </div>
+        <span class="card-price">$280</span>
+      </div>
+    </div>
+    <div class="collection-card reveal" style="transition-delay:0.1s">
+      <div class="card-img">
+        <div class="card-img-fill c2"></div>
+        <div class="card-overlay"><span class="card-overlay-text">Quick View</span></div>
+      </div>
+      <div class="card-label">
+        <div>
+          <p class="card-name">Drift Tee</p>
+          <p class="card-tag">Tops · SS25</p>
+        </div>
+        <span class="card-price">$85</span>
+      </div>
+    </div>
+    <div class="collection-card reveal" style="transition-delay:0.2s">
+      <div class="card-img">
+        <div class="card-img-fill c3"></div>
+        <div class="card-overlay"><span class="card-overlay-text">Quick View</span></div>
+      </div>
+      <div class="card-label">
+        <div>
+          <p class="card-name">Lost Cargo</p>
+          <p class="card-tag">Bottoms · SS25</p>
+        </div>
+        <span class="card-price">$195</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="statement-section">
+  <div class="statement-inner reveal">
+    <p class="statement-label">The Philosophy</p>
+    <p class="statement-text">"Between the known and the forgotten, we dress the wanderer."</p>
+    <a href="#about" class="statement-cta">Our Story</a>
+  </div>
+</section>
+<section class="section" id="about" style="max-width:800px">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-number">02 /</p>
+      <h2 class="section-title">About</h2>
+    </div>
+  </div>
+  <p class="reveal" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;line-height:1.7;color:var(--ink);margin-bottom:2rem;">
+    VheLostCity is a clothing brand born from the tension between movement and stillness — garments that carry the weight of a city you can't quite remember.
+  </p>
+  <p class="reveal" style="font-size:0.7rem;letter-spacing:0.1em;line-height:2;color:var(--ash);">
+    Each piece is designed with intentional restraint. No excess. No noise. Only the essential silhouette, made to outlast trends.
+  </p>
+</section>
+<footer id="contact">
+  <div>
+    <p class="footer-brand">VheLostCity</p>
+    <p class="footer-tagline">Lost in the Right Places</p>
+  </div>
+  <div>
+    <p class="footer-col-title">Navigate</p>
+    <ul class="footer-links">
+      <li><a href="#">Collections</a></li>
+      <li><a href="#">Lookbook</a></li>
+      <li><a href="#">Stockists</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </div>
+  <div>
+    <p class="footer-col-title">Follow</p>
+    <ul class="footer-links">
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">TikTok</a></li>
+      <li><a href="#">Pinterest</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2025 VheLostCity — All rights reserved</span>
+  <span>Crafted with intent</span>
+</div>
+<script>
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '6px';
+    cursor.style.height = '6px';
+    ring.style.width = '54px';
+    ring.style.height = '54px';
+    ring.style.opacity = '0.2';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px';
+    cursor.style.height = '10px';
+    ring.style.width = '36px';
+    ring.style.height = '36px';
+    ring.style.opacity = '0.4';
+  });
+});
+const items = ['New Arrivals', 'Free Shipping Over $150', 'SS25 Collection Live', 'Worldwide Shipping', 'Handcrafted Quality', 'Limited Runs'];
+const track = document.getElementById('marqueeTrack');
+const repeated = [...items, ...items, ...items, ...items];
+repeated.forEach((txt, i) => {
+  const span = document.createElement('span');
+  span.className = 'marquee-item' + (i % 2 === 1 ? ' marquee-dot' : '');
+  span.textContent = i % 2 === 1 ? '·' : txt;
+  track.appendChild(span);
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
