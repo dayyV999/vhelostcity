@@ -77,6 +77,11 @@
     color: var(--ink);
     text-decoration: none;
     position: relative;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+  }
+  .nav-links a.active {
+    opacity: 1;
   }
   .nav-links a::after {
     content: '';
@@ -720,14 +725,24 @@ function updateActiveNav() {
   });
 
   navLinks.forEach(link => {
-    link.style.opacity = '0.4';
+    link.classList.remove('active');
+
     if (link.getAttribute('href') === '#' + current) {
-      link.style.opacity = '1';
+      link.classList.add('active');
     }
   });
 }
+let ticking = false;
 
-window.addEventListener('scroll', updateActiveNav);
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(() => {
+      updateActiveNav();
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
 updateActiveNav();
 loadProducts();
 </script>
