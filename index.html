@@ -542,10 +542,64 @@
   color: var(--paper);
 }
 
-body.modal-open {
+body.loading {
   overflow: hidden;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+.site-loader {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: opacity 0.9s ease, visibility 0.9s ease;
+}
+
+.site-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-inner {
+  padding: 2rem;
+  max-width: 700px;
+}
+
+.loader-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.loader-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  animation: fadeUp 1s ease forwards;
+}
+
+.loader-sub {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ash);
+  line-height: 2;
+  animation: fadeUp 1.2s ease forwards;
+}
+ 
 @media (max-width: 768px) {
   nav { padding: 1.25rem 1.5rem; }
   .hero { padding: 0 1.5rem; }
@@ -565,6 +619,14 @@ body.modal-open {
 </style>
 </head>
 <body>
+ <div class="site-loader" id="siteLoader">
+  <div class="loader-inner">
+    <p class="loader-eyebrow">Loading</p>
+    <h1 class="loader-title">Welcome to VheLostCity</h1>
+    <p class="loader-sub">And remember — don’t get lost.</p>
+  </div>
+</div>
+ 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 <nav>
@@ -921,7 +983,19 @@ window.addEventListener('scroll', () => {
     ticking = true;
   }
 });
+const siteLoader = document.getElementById('siteLoader');
 
+document.body.classList.add('loading');
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (siteLoader) {
+      siteLoader.classList.add('hidden');
+    }
+    document.body.classList.remove('loading');
+  }, 2800);
+});
+ 
 updateActiveNav();
 loadProducts();
 const productModal = document.getElementById('productModal');
