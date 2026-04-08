@@ -14,7 +14,7 @@
     --smoke: #e8e4de;
     --accent: #1a1a1a;
   }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: auto; }
 
  section[id] {
   scroll-margin-top: 100px;
@@ -24,7 +24,7 @@
     color: var(--ink);
     font-family: 'Space Mono', monospace;
     overflow-x: hidden;
-    cursor: auto;
+    cursor: none;
   }
   .cursor {
     position: fixed;
@@ -932,7 +932,7 @@ async function loadProducts() {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
    document.querySelectorAll('.collection-card').forEach(card => {
     card.addEventListener('click', () => { 
-     openProductsModal({
+     openProductModal({
       name: card.dataset.name, 
       category: card.dataset.category, 
       price: card.dataset.price,
