@@ -653,8 +653,20 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 async function loadProducts() {
   try {
     const res = await fetch('/api/products');
-    const products = await res.json();
-
+    const products = [
+  {
+    name: "Obsidian Hoodie",
+    category: "Outerwear",
+    price: 120,
+    image: "https://via.placeholder.com/400x600"
+  },
+  {
+    name: "Ash Cargo Pants",
+    category: "Bottoms",
+    price: 90,
+    image: "https://via.placeholder.com/400x600"
+  }
+];
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
