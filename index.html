@@ -24,7 +24,7 @@
     color: var(--ink);
     font-family: 'Space Mono', monospace;
     overflow-x: hidden;
-    cursor: none;
+    cursor: auto;
   }
   .cursor {
     position: fixed;
@@ -547,21 +547,20 @@ body.modal-open {
 }
 
 @media (max-width: 768px) {
+  nav { padding: 1.25rem 1.5rem; }
+  .hero { padding: 0 1.5rem; }
+  .section { padding: 5rem 1.5rem; }
+  .collection-grid { grid-template-columns: 1fr; gap: 2rem; }
+  footer { grid-template-columns: 1fr; padding: 3rem 1.5rem 2rem; }
+  .footer-bottom { padding: 1.5rem; flex-direction: column; gap: 0.5rem; }
+  .hero-line { display: none; }
+
   .product-modal-content {
     padding: 1.25rem;
   }
 
   .product-modal-grid {
     grid-template-columns: 1fr;
-  }
-}
-    nav { padding: 1.25rem 1.5rem; }
-    .hero { padding: 0 1.5rem; }
-    .section { padding: 5rem 1.5rem; }
-    .collection-grid { grid-template-columns: 1fr; gap: 2rem; }
-    footer { grid-template-columns: 1fr; padding: 3rem 1.5rem 2rem; }
-    .footer-bottom { padding: 1.5rem; flex-direction: column; gap: 0.5rem; }
-    .hero-line { display: none; }
   }
 </style>
 </head>
@@ -810,6 +809,7 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
 async function loadProducts() {
   try {
     const products = [
@@ -832,6 +832,7 @@ async function loadProducts() {
         image: "https://via.placeholder.com/400x600"
       }
     ];
+
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
@@ -842,7 +843,14 @@ async function loadProducts() {
 
     grid.innerHTML = products.map((product, index) => {
       return `
-        <div class="collection-card reveal" style="transition-delay:${index * 0.1}s">
+        <div 
+          class="collection-card reveal"
+          style="transition-delay:${index * 0.1}s"
+          data-name="${product.name}"
+          data-category="${product.category}"
+          data-price="${product.price}"
+          data-image="${product.image}"
+        >
           <div class="card-img">
             <img src="${product.image}" alt="${product.name}">
             <div class="card-overlay">
@@ -859,40 +867,26 @@ async function loadProducts() {
         </div>
       `;
     }).join('');
-
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+   document.querySelectorAll('.collection-card').forEach(card => {
+    card.addEventListener('click', () => { 
+     openProductsModal({
+      name: card.dataset.name, 
+      category: card.dataset.category, 
+      price: card.dataset.price,
+      image: card.dataset.image
+     });
+   });
+ });   
   } catch (error) {
     console.error('Error loading products:', error);
 
     const grid = document.getElementById('productGrid');
     if (grid) {
-      grid.innerHTML = products.map((product, index) => {
-  return `
-    <div 
-      class="collection-card reveal"
-      style="transition-delay:${index * 0.1}s"
-      data-name="${product.name}"
-      data-category="${product.category}"
-      data-price="${product.price}"
-      data-image="${product.image}"
-    >
-      <div class="card-img">
-        <img src="${product.image}" alt="${product.name}">
-        <div class="card-overlay">
-          <span class="card-overlay-text">Quick View</span>
-        </div>
-      </div>
-      <div class="card-label">
-        <div>
-          <p class="card-name">${product.name}</p>
-          <p class="card-tag">${product.category} · SS25</p>
-        </div>
-        <span class="card-price">$${product.price}</span>
-      </div>
-    </div>
-  `;
-}).join('');
+      grid.innerHTML = '<p style="font-size:0.8rem; color: var(--ash);">Failed to load products.</p>';
     }
+  }
+}
 
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
@@ -915,9 +909,10 @@ function updateActiveNav() {
     }
   });
 }
+
 let ticking = false;
 
-window.addEventListener("scroll", () => {
+window.addEventListener('scroll', () => {
   if (!ticking) {
     window.requestAnimationFrame(() => {
       updateActiveNav();
@@ -926,8 +921,43 @@ window.addEventListener("scroll", () => {
     ticking = true;
   }
 });
+
 updateActiveNav();
 loadProducts();
+const productModal = document.getElementById('productModal');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalClose = document.getElementById('modalClose');
+const modalImage = document.getElementById('modalImage');
+const modalName = document.getElementById('modalName');
+const modalCategory = document.getElementById('modalCategory');
+const modalPrice = document.getElementById('modalPrice');
+
+function openProductModal(product) {
+  if (!productModal) return;
+
+  modalImage.src = product.image;
+  modalImage.alt = product.name;
+  modalName.textContent = product.name;
+  modalCategory.textContent = product.category;
+  modalPrice.textContent = `$${product.price}`;
+
+  productModal.classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+function closeProductModal() {
+  if (!productModal) return;
+
+  productModal.classList.remove('open');
+  document.body.classList.remove('modal-open');
+}
+
+if (modalBackdrop) modalBackdrop.addEventListener('click', closeProductModal);
+if (modalClose) modalClose.addEventListener('click', closeProductModal);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProductModal();
+});
 </script>
 </body>
 </html>
