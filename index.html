@@ -684,7 +684,87 @@ body.loading {
     transform: rotateX(12deg) rotateY(360deg);
   }
 }
- 
+ .music-player {
+  position: fixed;
+  left: 2rem;
+  bottom: 2rem;
+  z-index: 10001;
+  width: min(420px, calc(100% - 2rem));
+  background: rgba(245, 242, 236, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--smoke);
+  padding: 1rem 1rem 0.9rem;
+}
+
+.music-top {
+  margin-bottom: 0.85rem;
+}
+
+.music-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin-bottom: 0.5rem;
+}
+
+.music-track {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.music-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.music-controls button {
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 0.7rem 0.95rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: none;
+  transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+}
+
+.music-controls button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.music-controls button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 768px) {
+  .music-player {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    width: auto;
+    padding: 0.9rem;
+  }
+
+  .music-track {
+    font-size: 1rem;
+  }
+
+  .music-controls {
+    gap: 0.45rem;
+  }
+
+  .music-controls button {
+    flex: 1 1 calc(50% - 0.45rem);
+    padding: 0.75rem 0.8rem;
+  }
+}
 @media (max-width: 768px) {
   nav { padding: 1.25rem 1.5rem; }
   .hero { padding: 0 1.5rem; }
@@ -705,6 +785,23 @@ body.loading {
 </style>
 </head>
 <body>
+ <div class="music-player" id="musicPlayer">
+  <div class="music-top">
+    <p class="music-label">Sound</p>
+    <p class="music-track" id="trackTitle">No track playing</p>
+  </div>
+
+  <div class="music-controls">
+    <button id="prevTrack" type="button">◀◀</button>
+    <button id="playPauseTrack" type="button">Listen</button>
+    <button id="nextTrack" type="button">▶▶</button>
+    <button id="muteTrack" type="button">Mute</button>
+    <button id="loopTrack" type="button">Loop Off</button>
+  </div>
+</div>
+
+<audio id="siteAudio"></audio>
+ 
  <div class="site-loader" id="siteLoader">
   <div class="loader-inner">
     <div class="loader-logo-wrap">
@@ -1124,6 +1221,106 @@ if (modalClose) modalClose.addEventListener('click', closeProductModal);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeProductModal();
 });
+ document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeProductModal();
+});
+
+const siteAudio = document.getElementById('siteAudio');
+const trackTitle = document.getElementById('trackTitle');
+const playPauseTrack = document.getElementById('playPauseTrack');
+const prevTrack = document.getElementById('prevTrack');
+const nextTrack = document.getElementById('nextTrack');
+const muteTrack = document.getElementById('muteTrack');
+const loopTrack = document.getElementById('loopTrack');
+
+const playlist = [
+  {
+    title: 'Track One',
+    src: 'music/track1.mp3'
+  },
+  {
+    title: 'Track Two',
+    src: 'music/track2.mp3'
+  }
+];
+
+let currentTrackIndex = 0;
+let isPlaying = false;
+let isLooping = false;
+
+function loadTrack(index) {
+  const track = playlist[index];
+  if (!track || !siteAudio) return;
+
+  siteAudio.src = track.src;
+  trackTitle.textContent = track.title;
+}
+
+function playTrack() {
+  if (!siteAudio) return;
+
+  siteAudio.play().then(() => {
+    isPlaying = true;
+    playPauseTrack.textContent = 'Pause';
+  });
+}
+
+function pauseTrack() {
+  if (!siteAudio) return;
+
+  siteAudio.pause();
+  isPlaying = false;
+  playPauseTrack.textContent = 'Listen';
+}
+
+function togglePlayPause() {
+  if (isPlaying) pauseTrack();
+  else playTrack();
+}
+
+function nextSong() {
+  currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+  loadTrack(currentTrackIndex);
+  if (isPlaying) playTrack();
+}
+
+function prevSong() {
+  currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentTrackIndex);
+  if (isPlaying) playTrack();
+}
+
+function toggleMute() {
+  if (!siteAudio) return;
+
+  siteAudio.muted = !siteAudio.muted;
+  muteTrack.textContent = siteAudio.muted ? 'Unmute' : 'Mute';
+}
+
+function toggleLoop() {
+  if (!siteAudio) return;
+
+  isLooping = !isLooping;
+  siteAudio.loop = isLooping;
+  loopTrack.textContent = isLooping ? 'Loop On' : 'Loop Off';
+}
+
+if (playPauseTrack) playPauseTrack.addEventListener('click', togglePlayPause);
+if (nextTrack) nextTrack.addEventListener('click', nextSong);
+if (prevTrack) prevTrack.addEventListener('click', prevSong);
+if (muteTrack) muteTrack.addEventListener('click', toggleMute);
+if (loopTrack) loopTrack.addEventListener('click', toggleLoop);
+
+if (siteAudio) {
+  siteAudio.addEventListener('ended', () => {
+    if (!isLooping) {
+      nextSong();
+      playTrack();
+    }
+  });
+}
+
+loadTrack(currentTrackIndex);
 </script>
 </body>
 </html>
