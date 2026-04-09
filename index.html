@@ -785,20 +785,15 @@ body.loading {
 </style>
 </head>
 <body>
- <div class="music-player" id="musicPlayer">
-  <div class="music-top">
-    <p class="music-label">Sound</p>
-    <p class="music-track" id="trackTitle">No track playing</p>
-  </div>
-
-  <div class="music-controls">
-    <button id="prevTrack" type="button">◀◀</button>
-    <button id="playPauseTrack" type="button">Listen</button>
-    <button id="nextTrack" type="button">▶▶</button>
-    <button id="muteTrack" type="button">Mute</button>
-    <button id="loopTrack" type="button">Loop Off</button>
-  </div>
+ <div class="music-player minimal-player" id="musicPlayer" aria-label="Music player">
+  <button id="prevTrack" type="button" aria-label="Previous track">⏮</button>
+  <button id="playPauseTrack" type="button" aria-label="Play or pause">▶</button>
+  <button id="nextTrack" type="button" aria-label="Next track">⏭</button>
+  <button id="muteTrack" type="button" aria-label="Mute or unmute">🔇</button>
+  <button id="loopTrack" type="button" aria-label="Toggle loop">🔁</button>
 </div>
+
+<audio id="siteAudio"></audio>
 
 <audio id="siteAudio"></audio>
  
