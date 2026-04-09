@@ -1041,7 +1041,7 @@ async function loadProducts() {
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
 
-window.addEventListener("scroll", () => {
+function updateActiveNav() {
   let current = '';
 
   sections.forEach(section => {
