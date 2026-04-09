@@ -590,6 +590,7 @@ body.modal-open {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  z-index: -1; 
 }
 
 .loader-inner {
@@ -614,7 +615,7 @@ body.modal-open {
   color: #b08a56;
   position: relative;
   transform-style: preserve-3d;
-  animation: logoSpin3D 4.5s linear infinite;
+  animation: logoSpin3D 4.5s ease-in-out infinite;
   text-shadow:
     1px 1px 0 #9c7748,
     2px 2px 0 #89663d,
@@ -1074,14 +1075,18 @@ const siteLoader = document.getElementById('siteLoader');
 
 document.body.classList.add('loading');
 
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if (siteLoader) {
-      siteLoader.classList.add('hidden');
-    }
-    document.body.classList.remove('loading');
-  }, 2800);
+fuction hideLoader() {
+ if (siteLoader) { 
+  siteLoader.classList.add('hidden');
+ }
+ document.body.classList.remove('loading');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+ setTimeout(hideLoader, 2800); 
 });
+
+ window.addEventzListener('load', hideLoader);
  
 updateActiveNav();
 loadProducts();
