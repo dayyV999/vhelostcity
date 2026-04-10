@@ -1248,7 +1248,7 @@ const playlist = [
     src: 'music/track1.mp3'
   },
   {
-    title: 'Track Two',
+    title: 'Friends Again - Baby Rose , Leon Thomas',
     src: 'music/track2.mp3'
   },
   {
@@ -1260,7 +1260,8 @@ const playlist = [
 let currentTrackIndex = 0;
 let isPlaying = false;
 let popupTimeout;
-
+let fadeInterval = null; 
+ 
 function loadTrack(index) {
   const track = playlist[index];
   if (!track || !siteAudio) return;
@@ -1285,14 +1286,13 @@ function showSongPopup() {
 function playTrack() {
   if (!siteAudio) return;
 
-  siteAudio.play()
-    .then(() => {
+  siteAudio.play().then(() => {
       isPlaying = true;
       playPauseTrack.textContent = '⏸';
       playPauseTrack.classList.add('playing');
+      fadeInAudio(0.7, 1200); 
       showSongPopup();
-    })
-    .catch(error => {
+    }).catch(error => {
       console.error('Playback blocked:', error);
     });
 }
@@ -1330,6 +1330,58 @@ if (siteAudio) {
 
 loadTrack(currentTrackIndex);
 playPauseTrack.textContent = '▶';
+ function fadeInAudio(targetVolume = 0.7, duration = 1200) {
+  if (!siteAudio) return;
+
+  clearInterval(fadeInterval);
+  siteAudio.volume = 0;
+
+  const stepTime = 50;
+  const steps = duration / stepTime;
+  const volumeStep = targetVolume / steps;
+
+  fadeInterval = setInterval(() => {
+    if (siteAudio.volume < targetVolume) {
+      siteAudio.volume = Math.min(siteAudio.volume + volumeStep, targetVolume);
+    } else {
+      clearInterval(fadeInterval);
+    }
+  }, stepTime);
+}
+
+function fadeOutAudio(duration = 800) {
+  if (!siteAudio) return;
+
+  clearInterval(fadeInterval);
+
+  const stepTime = 50;
+  const steps = duration / stepTime;
+  const startVolume = siteAudio.volume || 0.7;
+  const volumeStep = startVolume / steps;
+
+  fadeInterval = setInterval(() => {
+    if (siteAudio.volume > volumeStep) {
+      siteAudio.volume = Math.max(siteAudio.volume - volumeStep, 0);
+    } else {
+      clearInterval(fadeInterval);
+      siteAudio.volume = 0;
+      siteAudio.pause();
+    }
+  }, stepTime);
+}
+ const savedIndex = localStorage.getItem('vlc_music_index');
+const savedPlaying = localStorage.getItem('vlc_music_playing');
+
+if (savedIndex !== null) {
+  currentTrackIndex = parseInt(savedIndex, 10) || 0;
+}
+
+loadTrack(currentTrackIndex);
+playPauseTrack.textContent = '▶';
+
+if (savedPlaying === 'true') {
+  songPopupTitle.textContent = `Ready — ${playlist[currentTrackIndex].title}`;
+}
 </script>
 </body>
 </html>
