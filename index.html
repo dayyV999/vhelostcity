@@ -553,7 +553,24 @@
   color: var(--ink);
   margin: 1.5rem 0 2rem;
 }
+.product-modal-details {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+}
 
+.product-modal-details p {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  color: var(--ash);
+  text-transform: uppercase;
+}
+
+.product-modal-details strong {
+  color: var(--ink);
+  font-weight: 400;
+}
 .product-modal-btn {
   display: inline-flex;
   align-items: center;
@@ -986,15 +1003,23 @@ body.loading {
       </div>
 
       <div class="product-modal-info">
-        <p class="product-modal-label">Quick View</p>
-        <h3 id="modalName"></h3>
-        <p id="modalCategory"></p>
-        <p id="modalPrice"></p>
-        <p class="product-modal-desc">
-          Crafted with restraint, structure, and a minimal silhouette designed to outlast trend cycles.
-        </p>
-        <a href="#contact" class="product-modal-btn">Inquire</a>
-      </div>
+  <p class="product-modal-label">Quick View</p>
+  <h3 id="modalName"></h3>
+  <p id="modalCategory"></p>
+  <p id="modalPrice"></p>
+
+  <p class="product-modal-desc" id="modalDescription"></p>
+
+  <div class="product-modal-details">
+    <p><strong>Fabric:</strong> <span id="modalFabric"></span></p>
+    <p><strong>Fit:</strong> <span id="modalFit"></span></p>
+    <p><strong>Color:</strong> <span id="modalColor"></span></p>
+    <p><strong>Sizes:</strong> <span id="modalSizes"></span></p>
+    <p><strong>Code:</strong> <span id="modalCode"></span></p>
+  </div>
+
+  <a href="#contact" class="product-modal-btn">Inquire</a>
+</div>
     </div>
   </div>
 </div>
@@ -1078,25 +1103,43 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 async function loadProducts() {
   try {
     const products = [
-      {
-        name: "Obsidian Hoodie",
-        category: "Outerwear",
-        price: 120,
-        image: "https://via.placeholder.com/400x600"
-      },
-      {
-        name: "Ash Cargo Pants",
-        category: "Bottoms",
-        price: 90,
-        image: "https://via.placeholder.com/400x600"
-      },
-      {
-        name: "Noir Tee",
-        category: "Tops",
-        price: 55,
-        image: "https://via.placeholder.com/400x600"
-      }
-    ];
+  {
+    name: "Obsidian Hoodie",
+    category: "Outerwear",
+    price: 120,
+    image: "https://via.placeholder.com/400x600",
+    description: "A heavyweight hoodie cut with a relaxed silhouette, dropped shoulders, and a washed obsidian tone designed for everyday wear.",
+    fabric: "100% Cotton Fleece",
+    fit: "Relaxed Fit",
+    color: "Obsidian Black",
+    sizes: "S, M, L, XL",
+    code: "VLC-OH-001"
+  },
+  {
+    name: "Ash Cargo Pants",
+    category: "Bottoms",
+    price: 90,
+    image: "https://via.placeholder.com/400x600",
+    description: "Structured cargo trousers with a straight-leg fit, utility pocket detailing, and a muted ash finish built for movement.",
+    fabric: "Cotton Twill Blend",
+    fit: "Straight Leg",
+    color: "Ash Grey",
+    sizes: "28, 30, 32, 34, 36",
+    code: "VLC-ACP-002"
+  },
+  {
+    name: "Noir Tee",
+    category: "Tops",
+    price: 55,
+    image: "https://via.placeholder.com/400x600",
+    description: "A premium essential tee with a slightly oversized cut, soft hand feel, and deep noir tone for a minimal everyday look.",
+    fabric: "240 GSM Cotton Jersey",
+    fit: "Boxy Fit",
+    color: "Noir Black",
+    sizes: "S, M, L, XL",
+    code: "VLC-NT-003"
+  }
+];
 
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -1109,13 +1152,19 @@ async function loadProducts() {
     grid.innerHTML = products.map((product, index) => {
       return `
         <div 
-          class="collection-card reveal"
-          style="transition-delay:${index * 0.1}s"
-          data-name="${product.name}"
-          data-category="${product.category}"
-          data-price="${product.price}"
-          data-image="${product.image}"
-        >
+  class="collection-card reveal"
+  style="transition-delay:${index * 0.1}s"
+  data-name="${product.name}"
+  data-category="${product.category}"
+  data-price="${product.price}"
+  data-image="${product.image}"
+  data-description="${product.description}"
+  data-fabric="${product.fabric}"
+  data-fit="${product.fit}"
+  data-color="${product.color}"
+  data-sizes="${product.sizes}"
+  data-code="${product.code}"
+>
           <div class="card-img">
             <img src="${product.image}" alt="${product.name}">
             <div class="card-overlay">
@@ -1136,11 +1185,17 @@ async function loadProducts() {
    document.querySelectorAll('.collection-card').forEach(card => {
     card.addEventListener('click', () => { 
      openProductModal({
-      name: card.dataset.name, 
-      category: card.dataset.category, 
-      price: card.dataset.price,
-      image: card.dataset.image
-     });
+  name: card.dataset.name,
+  category: card.dataset.category,
+  price: card.dataset.price,
+  image: card.dataset.image,
+  description: card.dataset.description,
+  fabric: card.dataset.fabric,
+  fit: card.dataset.fit,
+  color: card.dataset.color,
+  sizes: card.dataset.sizes,
+  code: card.dataset.code
+});
    });
  });   
   } catch (error) {
@@ -1211,6 +1266,12 @@ const modalImage = document.getElementById('modalImage');
 const modalName = document.getElementById('modalName');
 const modalCategory = document.getElementById('modalCategory');
 const modalPrice = document.getElementById('modalPrice');
+const modalDescription = document.getElementById('modalDescription');
+const modalFabric = document.getElementById('modalFabric');
+const modalFit = document.getElementById('modalFit');
+const modalColor = document.getElementById('modalColor');
+const modalSizes = document.getElementById('modalSizes');
+const modalCode = document.getElementById('modalCode');
 
 function openProductModal(product) {
   if (!productModal) return;
@@ -1220,6 +1281,12 @@ function openProductModal(product) {
   modalName.textContent = product.name;
   modalCategory.textContent = product.category;
   modalPrice.textContent = `$${product.price}`;
+  modalDescription.textContent = product.description || "";
+  modalFabric.textContent = product.fabric || "";
+  modalFit.textContent = product.fit || "";
+  modalColor.textContent = product.color || "";
+  modalSizes.textContent = product.sizes || "";
+  modalCode.textContent = product.code || "";
 
   productModal.classList.add('open');
   document.body.classList.add('modal-open');
