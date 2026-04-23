@@ -1,52 +1,124 @@
+/* ════════════════════════════════════════════
+   VheLostCity — index.js
+   ════════════════════════════════════════════ */
+
+/* ── LOADER ─────────────────────────────────── */
+const siteLoader = document.getElementById('siteLoader');
+document.body.classList.add('loading');
+
+function hideLoader() {
+  if (siteLoader) siteLoader.classList.add('hidden');
+  document.body.classList.remove('loading');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(hideLoader, 5000);
+});
+
+/* ── CUSTOM CURSOR ───────────────────────────── */
 const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
+const ring   = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
 
 document.addEventListener('mousemove', e => {
   mx = e.clientX;
   my = e.clientY;
-
   if (cursor) {
     cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
+    cursor.style.top  = my + 'px';
   }
 });
 
 (function animRing() {
   rx += (mx - rx) * 0.12;
   ry += (my - ry) * 0.12;
-
   if (ring) {
     ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
+    ring.style.top  = ry + 'px';
   }
-
   requestAnimationFrame(animRing);
 })();
 
-document.querySelectorAll('a, button').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    if (cursor && ring) {
-      cursor.style.width = '6px';
-      cursor.style.height = '6px';
-      ring.style.width = '54px';
-      ring.style.height = '54px';
-      ring.style.opacity = '0.2';
+function cursorGrow() {
+  if (cursor) { cursor.style.width = '6px';  cursor.style.height = '6px'; }
+  if (ring)   { ring.style.width   = '54px'; ring.style.height   = '54px'; ring.style.opacity = '0.2'; }
+}
+
+function cursorShrink() {
+  if (cursor) { cursor.style.width = '10px'; cursor.style.height = '10px'; }
+  if (ring)   { ring.style.width   = '36px'; ring.style.height   = '36px'; ring.style.opacity = '0.4'; }
+}
+
+function attachCursorHover(el) {
+  el.addEventListener('mouseenter', cursorGrow);
+  el.addEventListener('mouseleave', cursorShrink);
+}
+
+document.querySelectorAll('a, button').forEach(attachCursorHover);
+
+/* ── CURSOR COLOR ON DARK SECTION ────────────── */
+const darkSection = document.querySelector('.statement-section');
+
+if (darkSection && cursor && ring) {
+  darkSection.addEventListener('mouseenter', () => {
+    cursor.style.background  = '#ffffff';
+    ring.style.borderColor   = '#ffffff';
+  });
+  darkSection.addEventListener('mouseleave', () => {
+    cursor.style.background  = 'var(--ink)';
+    ring.style.borderColor   = 'var(--ink)';
+  });
+}
+
+/* ── NAV COLOR ON DARK SECTION ───────────────── */
+const nav         = document.getElementById('mainNav');
+const musicWrap   = document.querySelector('.music-toggle-wrap');
+
+function checkNavColor() {
+  if (!nav || !darkSection) return;
+  const navRect     = nav.getBoundingClientRect();
+  const sectionRect = darkSection.getBoundingClientRect();
+  const isOverDark  = navRect.bottom > sectionRect.top && navRect.top < sectionRect.bottom;
+
+  nav.classList.toggle('nav-white', isOverDark);
+  if (musicWrap) musicWrap.classList.toggle('audio-white', isOverDark);
+}
+
+window.addEventListener('scroll', checkNavColor, { passive: true });
+checkNavColor();
+
+/* ── ACTIVE NAV ON SCROLL ────────────────────── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+let ticking = false;
+
+function updateActiveNav() {
+  let current = '';
+  sections.forEach(section => {
+    if (window.scrollY >= section.offsetTop - 120) {
+      current = section.getAttribute('id');
     }
   });
-
-  el.addEventListener('mouseleave', () => {
-    if (cursor && ring) {
-      cursor.style.width = '10px';
-      cursor.style.height = '10px';
-      ring.style.width = '36px';
-      ring.style.height = '36px';
-      ring.style.opacity = '0.4';
-    }
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
   });
-});
+}
 
-const items = [
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      updateActiveNav();
+      checkNavColor();
+      ticking = false;
+    });
+    ticking = true;
+  }
+}, { passive: true });
+
+updateActiveNav();
+
+/* ── MARQUEE ─────────────────────────────────── */
+const marqueeItems = [
   'New Arrivals',
   'Free Shipping Over $150',
   'SS25 Collection Live',
@@ -55,212 +127,139 @@ const items = [
   'Limited Runs'
 ];
 
-const track = document.getElementById('marqueeTrack');
-if (track) {
-  const repeated = [...items, ...items, ...items, ...items];
+const marqueeTrack = document.getElementById('marqueeTrack');
+if (marqueeTrack) {
+  const repeated = [...marqueeItems, ...marqueeItems, ...marqueeItems, ...marqueeItems];
   repeated.forEach((txt, i) => {
     const span = document.createElement('span');
-    span.className = 'marquee-item' + (i % 2 === 1 ? ' marquee-dot' : '');
-    span.textContent = i % 2 === 1 ? '·' : txt;
-    track.appendChild(span);
+    const isDot = i % 2 === 1;
+    span.className   = 'marquee-item' + (isDot ? ' marquee-dot' : '');
+    span.textContent = isDot ? '·' : txt;
+    marqueeTrack.appendChild(span);
   });
 }
 
-const observer = new IntersectionObserver(entries => {
+/* ── SCROLL REVEAL ───────────────────────────── */
+const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) entry.target.classList.add('visible');
   });
 }, { threshold: 0.15 });
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+function observeRevealEls() {
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+}
 
-async function loadProducts() {
-  try {
-    const products = [
+observeRevealEls();
+
+/* ── PRODUCTS ────────────────────────────────── */
+const products = [
   {
-    name: "Obsidian Hoodie",
-    category: "Outerwear",
-    price: 125,
-    image: "https://via.placeholder.com/400x600",
-    description: "A heavyweight hoodie cut with a relaxed silhouette, dropped shoulders, and a washed obsidian tone designed for everyday wear.",
-    fabric: "100% Cotton Fleece",
-    fit: "Relaxed Fit",
-    color: "Obsidian Black",
-    sizes: "S, M, L, XL",
-    code: "VLC-OH-001"
+    name:        'Obsidian Hoodie',
+    category:    'Outerwear',
+    price:       125,
+    image:       'https://via.placeholder.com/400x600',
+    description: 'A heavyweight hoodie cut with a relaxed silhouette, dropped shoulders, and a washed obsidian tone designed for everyday wear.',
+    fabric:      '100% Cotton Fleece',
+    fit:         'Relaxed Fit',
+    color:       'Obsidian Black',
+    sizes:       'S, M, L, XL',
+    code:        'VLC-OH-001'
   },
   {
-    name: "Ash Cargo Trousers",
-    category: "Bottoms",
-    price: 95,
-    image: "https://via.placeholder.com/400x600",
-    description: "Structured cargo trousers with a straight-leg fit, utility pocket detailing, and a muted ash finish built for movement.",
-    fabric: "Cotton Twill Blend",
-    fit: "Straight Leg",
-    color: "Ash Grey",
-    sizes: "28, 30, 32, 34, 36",
-    code: "VLC-ACP-002"
+    name:        'Ash Cargo Trousers',
+    category:    'Bottoms',
+    price:       95,
+    image:       'https://via.placeholder.com/400x600',
+    description: 'Structured cargo trousers with a straight-leg fit, utility pocket detailing, and a muted ash finish built for movement.',
+    fabric:      'Cotton Twill Blend',
+    fit:         'Straight Leg',
+    color:       'Ash Grey',
+    sizes:       '28, 30, 32, 34, 36',
+    code:        'VLC-ACP-002'
   },
   {
-    name: "Noir Tee",
-    category: "Tops",
-    price: 45,
-    image: "https://via.placeholder.com/400x600",
-    description: "A premium essential tee with a slightly oversized cut, soft hand feel, and deep noir tone for a minimal everyday look.",
-    fabric: "240 GSM Cotton Jersey",
-    fit: "Boxy Fit",
-    color: "Noir Black",
-    sizes: "S, M, L, XL",
-    code: "VLC-NT-003"
+    name:        'Noir Tee',
+    category:    'Tops',
+    price:       45,
+    image:       'https://via.placeholder.com/400x600',
+    description: 'A premium essential tee with a slightly oversized cut, soft hand feel, and deep noir tone for a minimal everyday look.',
+    fabric:      '240 GSM Cotton Jersey',
+    fit:         'Boxy Fit',
+    color:       'Noir Black',
+    sizes:       'S, M, L, XL',
+    code:        'VLC-NT-003'
   }
 ];
 
-    const grid = document.getElementById('productGrid');
-    if (!grid) return;
+function loadProducts() {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
 
-    if (!products.length) {
-      grid.innerHTML = '<p style="font-size:0.8rem; color: var(--ash);">No products available right now.</p>';
-      return;
-    }
+  if (!products.length) {
+    grid.innerHTML = '<p style="font-size:0.8rem;color:var(--ash);">No products available right now.</p>';
+    return;
+  }
 
-    grid.innerHTML = products.map((product, index) => {
-      return `
-        <div 
-  class="collection-card reveal"
-  style="transition-delay:${index * 0.1}s"
-  data-name="${product.name}"
-  data-category="${product.category}"
-  data-price="${product.price}"
-  data-image="${product.image}"
-  data-description="${product.description}"
-  data-fabric="${product.fabric}"
-  data-fit="${product.fit}"
-  data-color="${product.color}"
-  data-sizes="${product.sizes}"
-  data-code="${product.code}"
->
-          <div class="card-img">
-            <img src="${product.image}" alt="${product.name}">
-            <div class="card-overlay">
-              <span class="card-overlay-text">Quick View</span>
-            </div>
-          </div>
-          <div class="card-label">
-            <div>
-              <p class="card-name">${product.name}</p>
-              <p class="card-tag">${product.category} · SS25</p>
-            </div>
-            <span class="card-price">$${product.price}</span>
-          </div>
+  grid.innerHTML = products.map((p, i) => `
+    <div class="collection-card reveal"
+      style="transition-delay:${i * 0.1}s"
+      data-name="${p.name}"
+      data-category="${p.category}"
+      data-price="${p.price}"
+      data-image="${p.image}"
+      data-description="${p.description}"
+      data-fabric="${p.fabric}"
+      data-fit="${p.fit}"
+      data-color="${p.color}"
+      data-sizes="${p.sizes}"
+      data-code="${p.code}">
+      <div class="card-img">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        <div class="card-overlay">
+          <span class="card-overlay-text">Quick View</span>
         </div>
-      `;
-    }).join('');
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-   document.querySelectorAll('.collection-card').forEach(card => {
-    card.addEventListener('click', () => { 
-     openProductModal({
-  name: card.dataset.name,
-  category: card.dataset.category,
-  price: card.dataset.price,
-  image: card.dataset.image,
-  description: card.dataset.description,
-  fabric: card.dataset.fabric,
-  fit: card.dataset.fit,
-  color: card.dataset.color,
-  sizes: card.dataset.sizes,
-  code: card.dataset.code
-});
-   });
- });   
-  } catch (error) {
-    console.error('Error loading products:', error);
+      </div>
+      <div class="card-label">
+        <div>
+          <p class="card-name">${p.name}</p>
+          <p class="card-tag">${p.category} · SS25</p>
+        </div>
+        <span class="card-price">$${p.price}</span>
+      </div>
+    </div>
+  `).join('');
 
-    const grid = document.getElementById('productGrid');
-    if (grid) {
-      grid.innerHTML = '<p style="font-size:0.8rem; color: var(--ash);">Failed to load products.</p>';
-    }
-  }
-}
+  observeRevealEls();
 
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-links a');
-
-function updateActiveNav() {
-  let current = '';
-
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - 120;
-    if (window.scrollY >= sectionTop) {
-      current = section.getAttribute('id');
-    }
-  });
-
-  navLinks.forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === '#' + current) {
-      link.classList.add('active');
-    }
+  document.querySelectorAll('.collection-card').forEach(card => {
+    card.addEventListener('click', () => openProductModal({ ...card.dataset }));
+    attachCursorHover(card);
   });
 }
 
-let ticking = false;
-
-window.addEventListener('scroll', () => {
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      updateActiveNav();
-      ticking = false;
-    });
-    ticking = true;
-  }
-});
-
-const siteLoader = document.getElementById('siteLoader');
-
-document.body.classList.add('loading');
-
-function hideLoader() {
-  if (siteLoader) {
-    siteLoader.classList.add('hidden');
-  }
-  document.body.classList.remove('loading');
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(hideLoader, 5000);
-});
-
-updateActiveNav();
 loadProducts();
 
-const productModal = document.getElementById('productModal');
+/* ── PRODUCT MODAL ───────────────────────────── */
+const productModal  = document.getElementById('productModal');
 const modalBackdrop = document.getElementById('modalBackdrop');
-const modalClose = document.getElementById('modalClose');
-const modalImage = document.getElementById('modalImage');
-const modalName = document.getElementById('modalName');
-const modalCategory = document.getElementById('modalCategory');
-const modalPrice = document.getElementById('modalPrice');
-const modalDescription = document.getElementById('modalDescription');
-const modalFabric = document.getElementById('modalFabric');
-const modalFit = document.getElementById('modalFit');
-const modalColor = document.getElementById('modalColor');
-const modalSizes = document.getElementById('modalSizes');
-const modalCode = document.getElementById('modalCode');
+const modalClose    = document.getElementById('modalClose');
+const modalInquireBtn = document.getElementById('modalInquireBtn');
 
-function openProductModal(product) {
+function openProductModal(p) {
   if (!productModal) return;
 
-  modalImage.src = product.image;
-  modalImage.alt = product.name;
-  modalName.textContent = product.name;
-  modalCategory.textContent = product.category;
-  modalPrice.textContent = `$${product.price}`;
-  modalDescription.textContent = product.description || "";
-  modalFabric.textContent = product.fabric || "";
-  modalFit.textContent = product.fit || "";
-  modalColor.textContent = product.color || "";
-  modalSizes.textContent = product.sizes || "";
-  modalCode.textContent = product.code || "";
+  document.getElementById('modalImage').src         = p.image;
+  document.getElementById('modalImage').alt         = p.name;
+  document.getElementById('modalName').textContent  = p.name;
+  document.getElementById('modalCategory').textContent = p.category;
+  document.getElementById('modalPrice').textContent = '$' + p.price;
+  document.getElementById('modalDescription').textContent = p.description || '';
+  document.getElementById('modalFabric').textContent = p.fabric || '';
+  document.getElementById('modalFit').textContent   = p.fit || '';
+  document.getElementById('modalColor').textContent = p.color || '';
+  document.getElementById('modalSizes').textContent = p.sizes || '';
+  document.getElementById('modalCode').textContent  = p.code || '';
 
   productModal.classList.add('open');
   document.body.classList.add('modal-open');
@@ -268,60 +267,50 @@ function openProductModal(product) {
 
 function closeProductModal() {
   if (!productModal) return;
-
   productModal.classList.remove('open');
   document.body.classList.remove('modal-open');
 }
 
 if (modalBackdrop) modalBackdrop.addEventListener('click', closeProductModal);
-if (modalClose) modalClose.addEventListener('click', closeProductModal);
+if (modalClose)    modalClose.addEventListener('click', closeProductModal);
+
+// Close modal when clicking Inquire link
+if (modalInquireBtn) {
+  modalInquireBtn.addEventListener('click', closeProductModal);
+}
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeProductModal();
 });
- document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeProductModal();
-});
 
-const siteAudio = document.getElementById('siteAudio');
-const playPauseTrack = document.getElementById('playPauseTrack');
-const songPopup = document.getElementById('songPopup');
+/* ── MUSIC PLAYER ────────────────────────────── */
+const siteAudio      = document.getElementById('siteAudio');
+const playPauseBtn   = document.getElementById('playPauseTrack');
+const songPopup      = document.getElementById('songPopup');
 const songPopupTitle = document.getElementById('songPopupTitle');
 
 const playlist = [
-  {
-    title: 'Treasue In The Hills - Leon Thomas',
-    src: 'music/track1.mp3'
-  },
-  {
-    title: 'Friends Again - Baby Rose , Leon Thomas',
-    src: 'music/track2.mp3'
-  },
-  {
-    title: 'Track Three',
-    src: 'music/track3.mp3'
-  }
+  { title: 'Treasure In The Hills — Leon Thomas',     src: 'music/track1.mp3' },
+  { title: 'Friends Again — Baby Rose & Leon Thomas', src: 'music/track2.mp3' },
+  { title: 'Track Three',                             src: 'music/track3.mp3' }
 ];
 
-let currentTrackIndex = 0;
-let isPlaying = false;
-let popupTimeout;
-let fadeInterval = null; 
- 
+let currentTrackIndex = parseInt(localStorage.getItem('vlc_music_index'), 10) || 0;
+let isPlaying    = false;
+let popupTimeout = null;
+let fadeInterval = null;
+
 function loadTrack(index) {
   const track = playlist[index];
   if (!track || !siteAudio) return;
-
   siteAudio.src = track.src;
-  songPopupTitle.textContent = `Now Playing — ${track.title}`;
+  if (songPopupTitle) songPopupTitle.textContent = 'Now Playing — ' + track.title;
 }
 
 function showSongPopup() {
   if (!songPopup) return;
-
   songPopup.classList.remove('hide');
   songPopup.classList.add('show');
-
   clearTimeout(popupTimeout);
   popupTimeout = setTimeout(() => {
     songPopup.classList.remove('show');
@@ -329,63 +318,12 @@ function showSongPopup() {
   }, 2600);
 }
 
-function playTrack() {
+function fadeInAudio(targetVolume = 0.7, duration = 1200) {
   if (!siteAudio) return;
-
-  siteAudio.play().then(() => {
-      isPlaying = true;
-      playPauseTrack.textContent = '⏸';
-      playPauseTrack.classList.add('playing');
-      fadeInAudio(0.7, 1200); 
-      showSongPopup();
-    }).catch(error => {
-      console.error('Playback blocked:', error);
-    });
-}
-
-function pauseTrack() {
-  if (!siteAudio) return;
-
-  siteAudio.pause();
-  isPlaying = false;
-  playPauseTrack.textContent = '▶';
-  playPauseTrack.classList.remove('playing');
-}
-
-function togglePlayPause() {
-  if (isPlaying) {
-    pauseTrack();
-  } else {
-    playTrack();
-  }
-}
-
-function playNextTrack() {
-  currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-  loadTrack(currentTrackIndex);
-  playTrack();
-}
-
-if (playPauseTrack) {
-  playPauseTrack.addEventListener('click', togglePlayPause);
-}
-
-if (siteAudio) {
-  siteAudio.addEventListener('ended', playNextTrack);
-}
-
-loadTrack(currentTrackIndex);
-playPauseTrack.textContent = '▶';
- function fadeInAudio(targetVolume = 0.7, duration = 1200) {
-  if (!siteAudio) return;
-
   clearInterval(fadeInterval);
   siteAudio.volume = 0;
-
-  const stepTime = 50;
-  const steps = duration / stepTime;
-  const volumeStep = targetVolume / steps;
-
+  const stepTime   = 50;
+  const volumeStep = targetVolume / (duration / stepTime);
   fadeInterval = setInterval(() => {
     if (siteAudio.volume < targetVolume) {
       siteAudio.volume = Math.min(siteAudio.volume + volumeStep, targetVolume);
@@ -397,14 +335,10 @@ playPauseTrack.textContent = '▶';
 
 function fadeOutAudio(duration = 800) {
   if (!siteAudio) return;
-
   clearInterval(fadeInterval);
-
-  const stepTime = 50;
-  const steps = duration / stepTime;
-  const startVolume = siteAudio.volume || 0.7;
-  const volumeStep = startVolume / steps;
-
+  const stepTime   = 50;
+  const startVol   = siteAudio.volume || 0.7;
+  const volumeStep = startVol / (duration / stepTime);
   fadeInterval = setInterval(() => {
     if (siteAudio.volume > volumeStep) {
       siteAudio.volume = Math.max(siteAudio.volume - volumeStep, 0);
@@ -415,54 +349,55 @@ function fadeOutAudio(duration = 800) {
     }
   }, stepTime);
 }
- const savedIndex = localStorage.getItem('vlc_music_index');
-const savedPlaying = localStorage.getItem('vlc_music_playing');
 
-if (savedIndex !== null) {
-  currentTrackIndex = parseInt(savedIndex, 10) || 0;
+function playTrack() {
+  if (!siteAudio) return;
+  siteAudio.play()
+    .then(() => {
+      isPlaying = true;
+      if (playPauseBtn) {
+        playPauseBtn.textContent = '⏸';
+        playPauseBtn.classList.add('playing');
+      }
+      fadeInAudio();
+      showSongPopup();
+      localStorage.setItem('vlc_music_playing', 'true');
+      localStorage.setItem('vlc_music_index', currentTrackIndex);
+    })
+    .catch(err => console.warn('Playback blocked:', err));
 }
 
-loadTrack(currentTrackIndex);
-playPauseTrack.textContent = '▶';
-
-if (savedPlaying === 'true') {
-  songPopupTitle.textContent = `Ready — ${playlist[currentTrackIndex].title}`;
-}
-const darkSections = document.querySelectorAll('.statement-section');
-
-darkSections.forEach(section => {
-  section.addEventListener('mouseenter', () => {
-    cursor.style.background = '#ffffff';
-    ring.style.borderColor = '#ffffff';
-  });
-
-  section.addEventListener('mouseleave', () => {
-    cursor.style.background = 'var(--ink)';
-    ring.style.borderColor = 'var(--ink)';
-  });
-});
-const nav = document.querySelector('nav');
-const darkSection = document.querySelector('.statement-section');
-const audio = document.querySelector('.music-toggle-wrap');
-
-function checkNavColor() {
-  const navRect = nav.getBoundingClientRect();
-  const sectionRect = darkSection.getBoundingClientRect();
-
-  const isOverDark =
-    navRect.bottom > sectionRect.top &&
-    navRect.top < sectionRect.bottom;
-
-  // NAV
-  nav.classList.toggle('nav-white', isOverDark);
-
-  // AUDIO
-  if (audio) {
-    audio.classList.toggle('audio-white', isOverDark);
+function pauseTrack() {
+  isPlaying = false;
+  if (playPauseBtn) {
+    playPauseBtn.textContent = '▶';
+    playPauseBtn.classList.remove('playing');
   }
+  fadeOutAudio();
+  localStorage.setItem('vlc_music_playing', 'false');
 }
 
-window.addEventListener('scroll', checkNavColor);
+function playNextTrack() {
+  currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+  loadTrack(currentTrackIndex);
+  playTrack();
+}
 
-// Run once on load
-checkNavColor();
+if (playPauseBtn) {
+  playPauseBtn.addEventListener('click', () => {
+    isPlaying ? pauseTrack() : playTrack();
+  });
+}
+
+if (siteAudio) {
+  siteAudio.addEventListener('ended', playNextTrack);
+}
+
+// Restore last track from localStorage
+loadTrack(currentTrackIndex);
+if (playPauseBtn) playPauseBtn.textContent = '▶';
+
+const savedPlaying = localStorage.getItem('vlc_music_playing');
+if (savedPlaying === 'true' && songPopupTitle) {
+  songPopupTitle.textContent = 'Ready — ' + playlist[currentTrackIndex].title;
+}

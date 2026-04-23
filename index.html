@@ -1,212 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VheLostCity v1.5</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%230d0d0d'/%3E%3Cpolygon points='10,10 22,10 32,50 27,50' fill='%23f5f2ec'/%3E%3Cpolygon points='54,10 42,10 32,50 37,50' fill='%23f5f2ec'/%3E%3Cline x1='0' y1='24' x2='64' y2='24' stroke='%230d0d0d' stroke-width='2.5'/%3E%3Cline x1='0' y1='36' x2='64' y2='36' stroke='%230d0d0d' stroke-width='2.5'/%3E%3Cline x1='10' y1='54' x2='54' y2='54' stroke='%23b8b4ae' stroke-width='0.8'/%3E%3Crect x='29' y='57' width='6' height='6' rx='1' fill='%23b8b4ae'/%3E%3C/svg%3E"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="index.css" />
-<script src="index.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VheLostCity</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%230d0d0d'/%3E%3Cpolygon points='10,10 22,10 32,50 27,50' fill='%23f5f2ec'/%3E%3Cpolygon points='54,10 42,10 32,50 37,50' fill='%23f5f2ec'/%3E%3Cline x1='0' y1='24' x2='64' y2='24' stroke='%230d0d0d' stroke-width='2.5'/%3E%3Cline x1='0' y1='36' x2='64' y2='36' stroke='%230d0d0d' stroke-width='2.5'/%3E%3Cline x1='10' y1='54' x2='54' y2='54' stroke='%23b8b4ae' stroke-width='0.8'/%3E%3Crect x='29' y='57' width='6' height='6' rx='1' fill='%23b8b4ae'/%3E%3C/svg%3E" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="index.css" />
 </head>
 <body>
- <div class="music-toggle-wrap">
-  <button id="playPauseTrack" class="music-toggle-btn" type="button" aria-label="Play or pause music">
-    ▶
-  </button>
-</div>
 
-<div class="song-popup" id="songPopup">
-  <span id="songPopupTitle">Now playing: Track One</span>
-</div>
-
-<audio id="siteAudio"></audio>
- 
- <div class="site-loader" id="siteLoader">
-  <div class="loader-inner">
-    <div class="loader-logo-wrap">
-      <div class="loader-logo-3d">VheLostCity</div>
-    </div>
-
-    <p class="loader-eyebrow">Loading</p>
-    <p class="loader-sub">Welcome to VheLostCity — and remember, don’t get lost.</p>
-  </div>
-</div>
- 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-<nav> 
-  <ul class="nav-links">
-    <li><a href="#home">Home</a></li> 
-    <li><a href="#collections">Collections</a></li>
-    <li><a href="#philosophy">Philosophy</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#stockists">Stockists</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-<section class="hero" id="home">
-  <p class="hero-eyebrow">Est. — Clothing & Apparel</p>
-  <div class="hero-name" style="animation-delay:0s"><span>Vhe</span></div>
-  <div class="hero-name"><span>Lost</span></div>
-  <div class="hero-name"><span>City</span></div>
-  <div class="hero-sub">
-    <p>Crafted for those<br>who move between worlds.</p>
-    <a href="#collections" class="hero-cta">
-      View Collection
-      <span style="display:inline-block;width:20px;height:1px;background:currentColor;"></span>
-    </a>
-  </div>
-  <div class="hero-line"></div>
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</section>
-<div class="marquee-section">
-  <div class="marquee-track" id="marqueeTrack"></div>
-</div>
-<section class="section" id="collections">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-number">01 /</p>
-      <h2 class="section-title">Current Drop</h2>
-    </div>
-    <a href="#" class="section-link">View all →</a>
-  </div>
- <div class="collection-grid" id="productGrid"></div>
-</section>
-<section class="statement-section" id="philosophy">
-  <div class="statement-inner reveal">
-    <p class="statement-label">The Philosophy</p>
-    <p class="statement-text">"Between the known and the forgotten, we dress the wanderer."</p>
-    <a href="#about" class="statement-cta">Our Story</a>
-  </div>
-</section>
-<section class="section" id="about" style="max-width:800px">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-number">02 /</p>
-      <h2 class="section-title">About</h2>
-    </div>
-  </div>
-  <p class="reveal" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;line-height:1.7;color:var(--ink);margin-bottom:2rem;">
-    VheLostCity is a clothing brand born from the tension between movement and stillness — garments that carry the weight of a city you can't quite remember.
-  </p>
-  <p class="reveal" style="font-size:0.7rem;letter-spacing:0.1em;line-height:2;color:var(--ash);">
-    Each piece is designed with intentional restraint. No excess. No noise. Only the essential silhouette, made to outlast trends.
-  </p> 
-</section>
- <section class="section" id="stockists">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-number">03 /</p>
-      <h2 class="section-title">Stockists</h2>
-    </div>
-  </div>
-
-  <div class="reveal" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:2rem;">
-    <div style="padding:1.5rem; border:1px solid var(--smoke);">
-      <p style="font-family:'Cormorant Garamond', serif; font-size:1.3rem; margin-bottom:0.5rem;">New York</p>
-      <p style="font-size:0.7rem; letter-spacing:0.08em; line-height:1.9; color:var(--ash);">
-        Coming soon<br>
-        Flagship placement in development
-      </p>
-    </div>
-
-    <div style="padding:1.5rem; border:1px solid var(--smoke);">
-      <p style="font-family:'Cormorant Garamond', serif; font-size:1.3rem; margin-bottom:0.5rem;">Los Angeles</p>
-      <p style="font-size:0.7rem; letter-spacing:0.08em; line-height:1.9; color:var(--ash);">
-        Select retail partners soon<br>
-        Private showroom appointments pending
-      </p>
-    </div>
-  </div>
-</section>
-  <section class="section" id="contact">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-number">04 /</p>
-      <h2 class="section-title">Contact</h2>
-    </div>
-  </div>
-
-  <div class="reveal" style="max-width:700px;">
-    <p style="font-family:'Cormorant Garamond', serif; font-size:1.6rem; font-weight:300; line-height:1.5; margin-bottom:1.5rem;">
-      For press, wholesale, collaborations, or private inquiries, reach out directly.
-    </p>
-
-    <div style="display:grid; gap:1rem;">
-      <p style="font-size:0.7rem; letter-spacing:0.12em; color:var(--ash); text-transform:uppercase;">
-        Email — contact@vhelostcity.com
-      </p>
-      <p style="font-size:0.7rem; letter-spacing:0.12em; color:var(--ash); text-transform:uppercase;">
-        Instagram — @vhelostcity
-      </p>
-      <p style="font-size:0.7rem; letter-spacing:0.12em; color:var(--ash); text-transform:uppercase;">
-        Wholesale inquiries by appointment only
-      </p>
-    </div>
-  </div>
-</section>
-<footer>
-  <div>
-    <p class="footer-brand">VheLostCity</p>
-    <p class="footer-tagline">Lost in the Right Places</p>
-  </div>
-  <div>
-    <p class="footer-col-title">Navigate</p>
-    <ul class="footer-links">
-      <li><a href="#collections">Collections</a></li>
-      <li><a href="#home">Lookbook</a></li>
-      <li><a href="#stockists">Stockists</a></li>
-      <li><a href="#about">About</a></li>
-    </ul>
-  </div>
-  <div>
-    <p class="footer-col-title">Follow</p>
-    <ul class="footer-links">
-      <li><a href="#">Instagram</a></li>
-      <li><a href="#">TikTok</a></li>
-      <li><a href="#">Pinterest</a></li>
-    </ul>
-  </div>
-</footer>
-<div class="footer-bottom">
-  <span>© 2025 VheLostCity — All rights reserved</span>
-  <span>Crafted with intent</span>
-</div>
- <div class="product-modal" id="productModal">
-  <div class="product-modal-backdrop" id="modalBackdrop"></div>
-
-  <div class="product-modal-content">
-    <button class="product-modal-close" id="modalClose">×</button>
-
-    <div class="product-modal-grid">
-      <div class="product-modal-image-wrap">
-        <img id="modalImage" src="" alt="">
+  <!-- ── LOADER ───────────────────────────────── -->
+  <div class="site-loader" id="siteLoader">
+    <div class="loader-inner">
+      <div class="loader-logo-wrap">
+        <div class="loader-logo-3d">VheLostCity</div>
       </div>
-
-      <div class="product-modal-info">
-  <p class="product-modal-label">Quick View</p>
-  <h3 id="modalName"></h3>
-  <p id="modalCategory"></p>
-  <p id="modalPrice"></p>
-
-  <p class="product-modal-desc" id="modalDescription"></p>
-
-  <div class="product-modal-details">
-    <p><strong>Fabric:</strong> <span id="modalFabric"></span></p>
-    <p><strong>Fit:</strong> <span id="modalFit"></span></p>
-    <p><strong>Color:</strong> <span id="modalColor"></span></p>
-    <p><strong>Sizes:</strong> <span id="modalSizes"></span></p>
-    <p><strong>Code:</strong> <span id="modalCode"></span></p>
-  </div>
-
-  <a href="#contact" class="product-modal-btn">Inquire</a>
-</div>
+      <p class="loader-eyebrow">Loading</p>
+      <p class="loader-sub">Welcome to VheLostCity — and remember, don't get lost.</p>
     </div>
   </div>
-</div>
+
+  <!-- ── CURSOR ────────────────────────────────── -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ── AUDIO ─────────────────────────────────── -->
+  <audio id="siteAudio" preload="none"></audio>
+
+  <!-- ── MUSIC TOGGLE ──────────────────────────── -->
+  <div class="music-toggle-wrap">
+    <button id="playPauseTrack" class="music-toggle-btn" type="button" aria-label="Play or pause music">
+      ▶
+    </button>
+  </div>
+
+  <!-- ── SONG POPUP ────────────────────────────── -->
+  <div class="song-popup" id="songPopup">
+    <span id="songPopupTitle"></span>
+  </div>
+
+  <!-- ── NAV ───────────────────────────────────── -->
+  <nav id="mainNav">
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#collections">Collections</a></li>
+      <li><a href="#philosophy">Philosophy</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#stockists">Stockists</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────── -->
+  <section class="hero" id="home">
+    <p class="hero-eyebrow">Est. — Clothing &amp; Apparel</p>
+    <div class="hero-name"><span>Vhe</span></div>
+    <div class="hero-name"><span>Lost</span></div>
+    <div class="hero-name"><span>City</span></div>
+    <div class="hero-sub">
+      <p>Crafted for those<br>who move between worlds.</p>
+      <a href="#collections" class="hero-cta">
+        View Collection
+        <span style="display:inline-block;width:20px;height:1px;background:currentColor;"></span>
+      </a>
+    </div>
+    <div class="hero-line"></div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ────────────────────────────────── -->
+  <div class="marquee-section">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+
+  <!-- ── COLLECTIONS ───────────────────────────── -->
+  <section class="section" id="collections">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-number">01 /</p>
+        <h2 class="section-title">Current Drop</h2>
+      </div>
+      <a href="#" class="section-link">View all →</a>
+    </div>
+    <div class="collection-grid" id="productGrid"></div>
+  </section>
+
+  <!-- ── PHILOSOPHY ────────────────────────────── -->
+  <section class="statement-section" id="philosophy">
+    <div class="statement-inner reveal">
+      <p class="statement-label">The Philosophy</p>
+      <p class="statement-text">"Between the known and the forgotten, we dress the wanderer."</p>
+      <a href="#about" class="statement-cta">Our Story</a>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ──────────────────────────────────── -->
+  <section class="section" id="about">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-number">02 /</p>
+        <h2 class="section-title">About</h2>
+      </div>
+    </div>
+    <div class="about-body">
+      <p class="about-lead reveal">
+        VheLostCity is a clothing brand born from the tension between movement and stillness — garments that carry the weight of a city you can't quite remember.
+      </p>
+      <p class="about-sub reveal">
+        Each piece is designed with intentional restraint. No excess. No noise. Only the essential silhouette, made to outlast trends.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── STOCKISTS ─────────────────────────────── -->
+  <section class="section" id="stockists">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-number">03 /</p>
+        <h2 class="section-title">Stockists</h2>
+      </div>
+    </div>
+    <div class="stockists-grid reveal">
+      <div class="stockist-card">
+        <p class="stockist-city">New York</p>
+        <p class="stockist-info">Coming soon<br>Flagship placement in development</p>
+      </div>
+      <div class="stockist-card">
+        <p class="stockist-city">Los Angeles</p>
+        <p class="stockist-info">Select retail partners soon<br>Private showroom appointments pending</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ────────────────────────────────── -->
+  <section class="section" id="contact">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-number">04 /</p>
+        <h2 class="section-title">Contact</h2>
+      </div>
+    </div>
+    <div class="contact-body reveal">
+      <p class="contact-lead">
+        For press, wholesale, collaborations, or private inquiries, reach out directly.
+      </p>
+      <div class="contact-details">
+        <p>Email — <a href="mailto:contact@vhelostcity.com">contact@vhelostcity.com</a></p>
+        <p>Instagram — <a href="#">@vhelostcity</a></p>
+        <p>Wholesale inquiries by appointment only</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────── -->
+  <footer>
+    <div>
+      <p class="footer-brand">VheLostCity</p>
+      <p class="footer-tagline">Lost in the Right Places</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Navigate</p>
+      <ul class="footer-links">
+        <li><a href="#collections">Collections</a></li>
+        <li><a href="#home">Lookbook</a></li>
+        <li><a href="#stockists">Stockists</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Follow</p>
+      <ul class="footer-links">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">Pinterest</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div class="footer-bottom">
+    <span>© 2025 VheLostCity — All rights reserved</span>
+    <span>Crafted with intent</span>
+  </div>
+
+  <!-- ── PRODUCT MODAL ──────────────────────────── -->
+  <div class="product-modal" id="productModal">
+    <div class="product-modal-backdrop" id="modalBackdrop"></div>
+    <div class="product-modal-content">
+      <button class="product-modal-close" id="modalClose" aria-label="Close">×</button>
+      <div class="product-modal-grid">
+        <div class="product-modal-image-wrap">
+          <img id="modalImage" src="" alt="" />
+        </div>
+        <div class="product-modal-info">
+          <p class="product-modal-label">Quick View</p>
+          <h3 id="modalName"></h3>
+          <p id="modalCategory"></p>
+          <p id="modalPrice"></p>
+          <p class="product-modal-desc" id="modalDescription"></p>
+          <div class="product-modal-details">
+            <p><strong>Fabric:</strong> <span id="modalFabric"></span></p>
+            <p><strong>Fit:</strong> <span id="modalFit"></span></p>
+            <p><strong>Color:</strong> <span id="modalColor"></span></p>
+            <p><strong>Sizes:</strong> <span id="modalSizes"></span></p>
+            <p><strong>Code:</strong> <span id="modalCode"></span></p>
+          </div>
+          <a href="#contact" class="product-modal-btn" id="modalInquireBtn">Inquire</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js" defer></script>
 </body>
 </html>
